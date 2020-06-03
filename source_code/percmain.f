@@ -91,7 +91,10 @@
       use parm
 
       integer :: j, j1, nn, k, sb,isp, ii
+      real :: ndt, tidt, dt_sep
       real :: lid_cuminf_total
+      
+      ndt = 24
       
       lid_cuminf_total = 0.
 
@@ -99,7 +102,7 @@
       j = ihru
       sb = inum1
       isp = isep_typ(j) 	   !! J.Jeong 6/25/14
-
+      
       !! initialize water entering first soil layer
 
       if (icrk == 1) then
@@ -124,86 +127,199 @@
       if (icrk == 1) then 
 	    call percmacro
 	    sepday = sepday - sepcrktot
-	  endif
-
-      do j1 = 1, sol_nly(j)
-        !! add water moving into soil layer from overlying layer
-        sol_st(j1,j) = sol_st(j1,j) + sepday
-
-        !! add percolated soil water from amended soil layers of the LIDs (rain garden and porous pavement) to the first soil layer of the corresponding HRU
-        if (j1 == 1.and.urblu(j) > 0) then
-!          lid_cuminf_total = 0.
-          do ii = 1, 4
-            if (ii == 2) then  ! 2: rain garden, 3: cistern and 4: porous pavement
-              lid_cuminf_total = lid_cuminf_total + 
-     &        lid_sw_add(j,ii) * lid_farea(j,ii) * 
-     &        fcimp(urblu(j)) * rg_sarea(sb,urblu(j))
-            else if (ii == 3) then
-              lid_cuminf_total = lid_cuminf_total + 
-     &        lid_sw_add(j,ii) * lid_farea(j,ii) * 
-     &        fcimp(urblu(j))
-            else if (ii == 4) then
-              lid_cuminf_total = lid_cuminf_total + 
-     &        lid_sw_add(j,ii) * lid_farea(j,ii) * 
-     &        fcimp(urblu(j))
+      endif
+      
+      dt_sep = sepday / ndt
+      
+      do tidt = 1, ndt
+          do j1 = 1, sol_nly(j)
+            !! add water moving into soil layer from overlying layer
+            if (j1 == 1) then
+                sol_st(j1,j) = sol_st(j1,j) + dt_sep
+            else 
+                sol_st(j1,j) = sol_st(j1,j) + sepday
+            endif
+                        
+            !! add percolated soil water from amended soil layers of the LIDs (rain garden and porous pavement) to the first soil layer of the corresponding HRU
+            if (j1 == 1.and.urblu(j) > 0) then
+    !          lid_cuminf_total = 0.
+              do ii = 1, 4
+                if (ii == 2) then  ! 2: rain garden, 3: cistern and 4: porous pavement
+                  lid_cuminf_total = lid_cuminf_total + 
+     &            lid_sw_add(j,ii) * lid_farea(j,ii) * 
+     &            fcimp(urblu(j)) * rg_sarea(sb,urblu(j))
+                else if (ii == 3) then
+                  lid_cuminf_total = lid_cuminf_total + 
+     &            lid_sw_add(j,ii) * lid_farea(j,ii) * 
+     &            fcimp(urblu(j))
+                else if (ii == 4) then
+                  lid_cuminf_total = lid_cuminf_total + 
+     &            lid_sw_add(j,ii) * lid_farea(j,ii) * 
+     &            fcimp(urblu(j))
+                end if
+              end do
+              sol_st(j1,j) = sol_st(j1,j) + lid_cuminf_total
             end if
-          end do
-          sol_st(j1,j) = sol_st(j1,j) + lid_cuminf_total
-        end if
         
- 	  !! septic tank inflow to biozone layer  J.Jeong
-	  ! STE added to the biozone layer if soil temp is above zero. 
-	  if(j1==i_sep(j).and.sol_tmp(j1,j) > 0. .and. isep_opt(j) /= 0) then
-		  sol_st(j1,j) = sol_st(j1,j) + qstemm(j)  ! in mm
-	    qvol = qstemm(j) * hru_ha(j) * 10.
-		  xx = qvol / hru_ha(j) / 1000.
-          sol_no3(j1,j) = sol_no3(j1,j) + xx *(sptno3concs(isp) 
+ 	      !! septic tank inflow to biozone layer  J.Jeong
+	      ! STE added to the biozone layer if soil temp is above zero. 
+	      if(j1==i_sep(j).and.sol_tmp(j1,j) > 0. .and. 
+     &        isep_opt(j) /= 0) then
+		      sol_st(j1,j) = sol_st(j1,j) + qstemm(j)  ! in mm
+	        qvol = qstemm(j) * hru_ha(j) * 10.
+		      xx = qvol / hru_ha(j) / 1000.
+              sol_no3(j1,j) = sol_no3(j1,j) + xx *(sptno3concs(isp) 
      &                    + sptno2concs(isp))  
-          sol_nh3(j1,j) = sol_nh3(j1,j) + xx * sptnh4concs(isp) 
-          sol_orgn(j1,j) = sol_orgn(j1,j) + xx * sptorgnconcs(isp)*0.5
-          sol_fon(j1,j) = sol_fon(j1,j) + xx * sptorgnconcs(isp) * 0.5
-          sol_orgp(j1,j) = sol_orgp(j1,j) + xx * sptorgps(isp) * 0.5
-          sol_fop(j1,j) = sol_fop(j1,j) + xx * sptorgps(isp) * 0.5
-          sol_solp(j1,j) = sol_solp(j1,j) + xx * sptminps(isp)  
-          bio_bod(j)=bio_bod(j)+xx*sptbodconcs(isp)   ! J.Jeong 4/03/09
-        end if
+              sol_nh3(j1,j) = sol_nh3(j1,j) + xx * sptnh4concs(isp) 
+              sol_orgn(j1,j) = sol_orgn(j1,j) + xx * 
+     &            sptorgnconcs(isp)*0.5
+              sol_fon(j1,j) = sol_fon(j1,j) + xx * 
+     &            sptorgnconcs(isp) * 0.5
+              sol_orgp(j1,j) = sol_orgp(j1,j) + xx * sptorgps(isp) * 0.5
+              sol_fop(j1,j) = sol_fop(j1,j) + xx * sptorgps(isp) * 0.5
+              sol_solp(j1,j) = sol_solp(j1,j) + xx * sptminps(isp)  
+              bio_bod(j)=bio_bod(j)+xx*sptbodconcs(isp)   ! J.Jeong 4/03/09
+            end if
 
-       !! determine gravity drained water in layer
-        sw_excess = 0.
-        sw_excess = sol_st(j1,j) - sol_fc(j1,j)
+           !! determine gravity drained water in layer
+            sw_excess = 0.
+            sw_excess = sol_st(j1,j) - sol_fc(j1,j)
+            !!GWP edit
+            if (sw_excess < 0.) sw_excess = 0. 
+        
 
-        !! initialize variables for current layer
-        sepday = 0.
-        latlyr = 0.
-        lyrtile = 0.
-        lyrtilex = 0.
+            !! initialize variables for current layer
+            sepday = 0.
+            latlyr = 0.
+            lyrtile = 0.
+            lyrtilex = 0.
 
-        if (sw_excess > 1.e-5) then
-          !! calculate tile flow (lyrtile), lateral flow (latlyr) and
-          !! percolation (sepday)
-          call percmicro(j1)
+    !        if (sw_excess > 1.e-5) then
+    !          !! calculate tile flow (lyrtile), lateral flow (latlyr) and
+    !          !! percolation (sepday)
+    !          call percmicro(j1)
+    !
+    !         sol_st(j1,j) = sol_st(j1,j) - sepday - latlyr - lyrtile
+    !          sol_st(j1,j) = Max(1.e-6,sol_st(j1,j))
+    !
+    !          !! redistribute soil water if above field capacity (high water table)
+    !          call sat_excess(j1)
+    !!         sol_st(j1,j) = sol_st(j1,j) - lyrtilex
+    !!         sol_st(j1,j) = Max(1.e-6,sol_st(j1,j))
+    !        end if
 
-          sol_st(j1,j) = sol_st(j1,j) - sepday - latlyr - lyrtile
-          sol_st(j1,j) = Max(1.e-6,sol_st(j1,j))
+		    !SWC edits by GWP (also shut off lines above, double !! means was already off)
+		    ! REMOVE FIELD CAPACITY FLAG
+              !if (sw_excess > 1.e-5) then
+              if (sol_st(j1,j) > 1.e-5) then
+                  call percmicro(j1) ! calculate latlyr and sepday
+                  !This code no longer needed b/c now updating sol_st and sepage in percmicro
+ !                 sol_st(j1,j) = sol_st(j1,j) - sepday - 
+ !    &                latlyr - lyrtile
+                  !sol_st(j1,j) = Max(1.e-6, sol_st(j1,j))
+                  !sol_st(j1,j) = sol_st(j1,j) - latlyr - lyrtile 
+                  
+                  !GWP EDITS
+                  !Remove the seepage from the soil water content depending upon saturation level
+                  if (sol_st(j1,j) > sol_fc(j1,j)) then
+                      if (sepday + latlyr > sw_excess) then
+                          ratio = 0.
+                          ratio = sepday / (latlyr + sepday)
+                          sepday = 0.
+                          latlyr = 0.
+                          sepday = sw_excess * ratio
+                          latlyr = sw_excess * (1. - ratio)
+                          sol_st(j1,j) = sol_fc(j1,j)
+                      else
+                          sepday = sepday
+                          latlyr = latlyr
+                          sol_st(j1,j) = sol_st(j1,j) - sepday - latlyr
+                      end if          
+                  else
+                      if (sepday > sol_st(j1,j)) then
+                          sepday = sol_st(j1,j)
+                          sol_st(j1,j) = 0.
+                      else
+                          sol_st(j1,j) = sol_st(j1,j) - sepday
+                      end if
+                  end if
+                  
+                  !New mass balance check; already subtracted out sepday and latlyr
+                  if (lyrtile < sepday) then
+                      sepday = sepday - lyrtile
+                  else
+                      sol_st(j1,j) = sol_st(j1,j) - (lyrtile - sepday)
+                      sepday = 0. 
+                  end if
+!                  if (sw_excess > 1.e-5) then
+!                      if (sepday + latlyr > sw_excess) then
+!                        ratio = 0.
+!                        ratio = sepday / (latlyr + sepday)
+!                        sepday = 0.
+!                        latlyr = 0.
+!                        sepday = sw_excess * ratio
+!                        latlyr = sw_excess * (1. - ratio)
+!                      endif
+!                      if (sepday + lyrtile > sw_excess) then
+!                        sepday = 0.
+!                        sepday = sw_excess - lyrtile
+!                      endif
+!                      sol_st(j1,j) = sol_st(j1,j) - sepday - latlyr - 
+!     &                    lyrtile
+!                  else
+!                      if (sepday + latlyr > sol_st(j1,j)) then
+!                        ratio = 0.
+!                        ratio = sepday / (latlyr + sepday)
+!                        sepday = 0.
+!                        latlyr = 0.
+!                        sepday = sol_st(j1,j) * ratio
+!                        latlyr = sol_st(j1,j) * (1. - ratio)
+!                      endif
+!                      if (sepday + lyrtile > sol_st(j1,j)) then
+!
+!                        sepday = 0.
+!                        sepday = sol_st(j1,j) - lyrtile
+!                      endif
+!                      sol_st(j1,j) = sol_st(j1,j) - sepday - latlyr - 
+!     &                    lyrtile
+!                  endif
+!                  
+                  !sol_st(j1,j) = Max(1.e-6,sol_st(j1,j))            
 
-          !! redistribute soil water if above field capacity (high water table)
-          call sat_excess(j1)
-!         sol_st(j1,j) = sol_st(j1,j) - lyrtilex
-!         sol_st(j1,j) = Max(1.e-6,sol_st(j1,j))
-        end if
-
-        !! summary calculations
-        if (j1 == sol_nly(j)) then
-          sepbtm(j) = sepbtm(j) + sepday
-        endif
-        latq(j) = latq(j) + latlyr
-        qtile = qtile + lyrtile
-        flat(j1,j) = latlyr + lyrtile
-        sol_prk(j1,j) = sol_prk(j1,j) + sepday
-	  if (latq(j) < 1.e-6) latq(j) = 0.
-        if (qtile < 1.e-6) qtile = 0.
-        if (flat(j1,j) < 1.e-6) flat(j1,j) = 0.
+                                     
+                  !! redistribute soil water if above field capacity (high water table)
+                  !only isep =/= 0 options now
+                  call sat_excess(j1)
+                  
+                  !check if below minimum values
+                  if (sol_st(j1,j) < 0.) then
+                      sepday = sepday + sol_st(j1,j) ! sol_st will be negative so it is like subtracting
+                      sol_st(j1,j) = 0.
+                  end if
+                                 
+              end if
+              !End GWP edits
+        
+            !! summary calculations
+            if (j1 == sol_nly(j)) then
+              sepbtm(j) = sepbtm(j) + sepday
+            endif
+            latq(j) = latq(j) + latlyr
+            qtile = qtile + lyrtile
+            flat(j1,j) = flat(j1,j) + latlyr + lyrtile
+            sol_prk(j1,j) = sol_prk(j1,j) + sepday
+	      if (latq(j) < 1.e-6) latq(j) = 0.
+            if (qtile < 1.e-6) qtile = 0.
+            if (flat(j1,j) < 1.e-6) flat(j1,j) = 0.
+            !store these for debugging
+            sol_sep(j1,j) = sol_prk(j1,j)
+            sol_lat(j1,j) = flat(j1,j)
+            infl_print(j1,j) = inflpcp
+          end do
       end do
+      
+      
+      
           
         !! bmp adjustment
         latq(j) = latq(j) * bmp_flos(j)

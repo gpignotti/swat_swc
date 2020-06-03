@@ -281,6 +281,20 @@
         pdvas(78) = hrumono(71,j)
 !!      phos due to crack flow (tvap)
         pdvas(79) = hrumono(72,j)
+        
+# GWP edits
+        pdvas(80) = hrumono(73,j) / Real(days)
+        pdvas(81) = hrumono(74,j) / Real(days)
+        pdvas(82) = hrumono(75,j) / Real(days)
+        pdvas(83) = hrumono(76,j) / Real(days)
+        pdvas(84) = hrumono(77,j) / Real(days)
+        pdvas(85) = hrumono(78,j) / Real(days)
+        pdvas(86) = hrumono(79,j) / Real(days)
+        pdvas(87) = hrumono(80,j) / Real(days)
+        pdvas(88) = hrumono(81,j) / Real(days)
+        pdvas(89) = hrumono(82,j) / Real(days)
+
+# end GWP edits
 
       if (itots > 0) then 
 	   ix = itots

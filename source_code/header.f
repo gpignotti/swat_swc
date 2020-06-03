@@ -26,7 +26,7 @@
 
       use parm
 
-!!    column headers for HRU output file
+!!    column headers for HRU output file - edited by GWP
       heds = (/"  PRECIPmm"," SNOFALLmm"," SNOMELTmm","     IRRmm",     
      &         "     PETmm","      ETmm"," SW_INITmm","  SW_ENDmm",     
      &         "    PERCmm"," GW_RCHGmm"," DA_RCHGmm","   REVAPmm",     
@@ -46,7 +46,10 @@
      &         "       LAI","   YLDt/ha","  BACTPct ","  BACTLPct",     
      &         " WTAB CLIm"," WTAB SOLm","     SNOmm"," CMUPkg/ha",     
      &         "CMTOTkg/ha","   QTILEmm"," TNO3kg/ha"," LNO3kg/ha",     
-     &         "  GW_Q_Dmm"," LATQCNTmm"," TVAPkg/ha"/)
+     &         "  GW_Q_Dmm"," LATQCNTmm"," TVAPkg/ha"," VSM1mm/mm",
+     &         " VSM2mm/mm"," VSM3mm/mm"," VSM4mm/mm"," VSM5mm/mm",
+     &         " VSM6mm/mm"," VSM7mm/mm"," VSM8mm/mm"," VSM9mm/mm", 
+     &         "VSM10mm/mm","VSM11mm/mm"/)
 
 
 !!    numbers printed to VB interface HRU output file 

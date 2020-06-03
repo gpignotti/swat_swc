@@ -403,6 +403,9 @@
       read (103,*) epcobsn
       read (103,*) evlai
       read (103,*) ffcb
+!GWP edits
+      read (103,*) swcexp
+!end edits
       read (103,1000) titldum
       read (103,*) ievent
       read (103,*) icrk
@@ -566,6 +569,7 @@
       if (eof < 0) exit
       read (103,*,iostat=eof) drain_co_bsn
       if (eof < 0) exit
+
 !!    Drainmod input variables - 01/2006
       read (103,*,iostat=eof) pc_bsn
       if (eof < 0) exit
@@ -587,8 +591,12 @@
       read (103,*,iostat=eof) sstmaxd_bsn
       if (eof < 0) exit
       read (103,*,iostat=eof) ismax
-      if (eof < 0) exit   
-      read (103,*,iostat=eof) iroutunit
+      if (eof < 0) exit
+      read (103,*,iostat=eof) iroutunit          
+      !!	SWC edits by GWP
+      if (eof < 0) exit
+      read (103,*,iostat=eof) iperc
+!!    End GWP edits
       exit
 !!    Drainmod input variables - 01/2006
       end do

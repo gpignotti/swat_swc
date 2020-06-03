@@ -45,6 +45,9 @@
       real :: wshd_pup, wshd_wstrs, wshd_nstrs, wshd_pstrs, wshd_tstrs
       real :: wshd_astrs
       real :: wshd_hmn, wshd_rwn, wshd_hmp, wshd_rmn, wshd_dnit, ffcb
+!GWP edits
+      real :: swcexp
+!end edits      
       real :: wshd_rmp, wshd_voln, wshd_nitn, wshd_pas, wshd_pal, wdpq
       real :: wshd_plch, wshd_raino3, ressedc, basno3f, basorgnf, wof_p
       real :: wshd_pinlet, wshd_ptile
@@ -656,7 +659,7 @@
       character(len=16), dimension (:), allocatable :: snam
       character(len=17), dimension (300) :: pname
 !!    adding qtile to output.hru write 3/2/2010 gsm  increased heds(70) to heds(71)
-      character(len=13) :: heds(79),hedb(24),hedr(46),hedrsv(41)
+      character(len=13) :: heds(90),hedb(24),hedr(46),hedrsv(41)
       character(len=13) :: hedwtr(40)
       character(len=4) :: title(60), cpnm(5000)
       character(len=17), dimension(50) :: fname
@@ -965,6 +968,19 @@
       real, dimension(:), allocatable :: tillage_factor
       ! tillage_factor: = 1.6 in 30 days after tillage practices occur; otherwise 1.0;
 !! By Zhang for C/N cycling
+
+      !!GWP edits for soil water changes
+      integer :: iperc, iwriteperc ! flags
+      ! can use these for debugging
+      real, dimension(:,:), allocatable :: sol_sepp, sol_exw, sol_ule
+      real, dimension (:,:), allocatable :: sol_dg, sol_sep, sol_lat
+      real, dimension (:,:), allocatable :: infl_print
+      !Parameters for PTFs
+      real, dimension(:,:), allocatable :: wo_thr,
+     &  rb_thr, ca_rb_b, vg_rb_m, ca_co_b, vg_co_m,
+     &  ca_sx_b, vg_sx_m, ca_wo_b, vg_wo_m
+      real, dimension(:,:), allocatable :: vswc
+!!    End GWP edits
 
 
 

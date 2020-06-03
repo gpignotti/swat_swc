@@ -189,7 +189,7 @@
       !!by zhang print out soil water
       !!===============================    
       integer :: ly
-      real :: sumwater, sumwfsc, sumdepth, sat, wc, dp
+      real :: sumwater, sumwfsc, sumdepth, sat, wc, dp, z
       real :: ssoilwater(100), swfsc(100)
       real :: soilwater(11), wfsc(11), sum_depth(11) !10, 100, 200, 300, 400, ..., 1000 mm
       !!by zhang print out soil water
@@ -299,8 +299,7 @@
       end if
       !!by zhang print out soil water
       !!===============================
-
-
+ 
       j = 0
       j = ihru
       sb = hru_sub(j)
@@ -405,6 +404,22 @@
 !!    phos due to crack flow (tvap)
       pdvas(79) = vap_tile
 
+!!    GWP edits to print volumetric soil water content      
+      pdvas(80) = vswc(1,j)
+      pdvas(81) = vswc(2,j)
+      pdvas(82) = vswc(3,j)
+      pdvas(83) = vswc(4,j)
+      pdvas(84) = vswc(5,j)
+      pdvas(85) = vswc(6,j)
+      pdvas(86) = vswc(7,j)
+      pdvas(87) = vswc(8,j)
+      pdvas(88) = vswc(9,j)
+      pdvas(89) = vswc(10,j)
+
+!!    #End GWP edits  
+        
+      
+      
       call xmon 
           
       if (ipdvas(1) > 0) then
@@ -537,6 +552,11 @@
       !!output carbon related variables
       !!=================================
 
+      !! SWC edits by GWP
+3333    format(i5,1x,i5,1x,i2,1x,i2,1x,i4,1x,i1,1x,f8.3)
+4447    format (i5,1x,i5,1x,i3,1x,f7.1,1x,f8.3,1x,f8.3,1x,f8.3)
+!!    End GWP edits
+      
       return
 
 1000  format (a4,i5,1x,a5,a4,i5,1x,i4,1x,i4,e10.5,66f10.3,1x,e10.5,1x,e10.5,8e10.3,3f10.3,1x,i4)

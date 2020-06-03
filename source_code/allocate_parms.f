@@ -55,7 +55,9 @@
       
 !! initialize variables    
       mvaro = 33
-      mhruo = 79
+      !GWP edit
+      mhruo = 89
+      !end GWP edit
       mrcho = 62
       msubo = 24
       mstdo = 113
@@ -1416,9 +1418,9 @@
       allocate (hrupsty(mpst,4,mhru))
       allocate (icols(mhruo))
       allocate (ipdvas(mhruo))
-      allocate (hrumono(74,mhru))
-      allocate (hruyro(74,mhru))
-      allocate (hruaao(74,mhru))
+      allocate (hrumono(85,mhru))
+      allocate (hruyro(85,mhru))
+      allocate (hruaao(85,mhru))
       allocate (wtrmon(40,mhru))
       allocate (wtryr(40,mhru))
       allocate (wtraa(40,mhru))
@@ -1881,6 +1883,30 @@
        tillage_factor = 0.
       !! By Zhang for C/N cycling
       !! ============================
+      
+      !!  SWC edits by GWP
+      !new variables for soil water storage
+      allocate(sol_dg(mlyr,mhru))
+      allocate(sol_sep(mlyr,mhru))
+      allocate(sol_lat(mlyr,mhru))
+      allocate(infl_print(mlyr,mhru))
+      allocate(sol_sepp(mlyr,mhru))
+      allocate(sol_exw(mlyr,mhru))
+      allocate(sol_ule(mlyr,mhru))
+      !PTF parameters
+      allocate(wo_thr(mlyr,mhru))
+      allocate(rb_thr(mlyr,mhru))
+      allocate(ca_rb_b(mlyr,mhru))
+      allocate(vg_rb_m(mlyr,mhru))
+      allocate(ca_co_b(mlyr,mhru))
+      allocate(vg_co_m(mlyr,mhru))
+      allocate(ca_sx_b(mlyr,mhru))
+      allocate(vg_sx_m(mlyr,mhru))
+      allocate(ca_wo_b(mlyr,mhru))
+      allocate(vg_wo_m(mlyr,mhru))
+      
+      allocate(vswc(mlyr+1,mhru))
+      !!End GWP edits
       	  
       call zero0
       call zero1

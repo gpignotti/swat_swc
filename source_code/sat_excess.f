@@ -139,41 +139,85 @@
 	endif
 	       
       if (isep_opt(j)==0) then
-      if (j1 < sol_nly(j)) then
-        if (sol_st(j1,j) - sol_ul(j1,j) > 1.e-4) then
-          sepday = sepday + (sol_st(j1,j) - sol_ul(j1,j))
-          sol_st(j1,j) = sol_ul(j1,j)
-        end if
-      else
+          !! GWP Edits to check max and min soil moisture and resdistribute if saturated                  
+          !check if greater than saturation
+          if (sol_st(j1,j) - sol_ul(j1,j) > 1.e-4) then
+              ul_excess = sol_st(j1,j) - sol_ul(j1,j)
+              sol_st(j1,j) = sol_ul(j1,j)                      
+              !check if is first layer
+              if (j1 == 1) then
+                  if (pot_fr(j) > 0.) then
+                      pot_vol(j) = pot_vol(j) + ul_excess
+                  else
+                      surfq(j) = surfq(j) + ul_excess
+                  end if
+                  ul_excess = 0.
+              else !not top layer
+                  nn = j1
+                  do ly = nn-1,1,-1 !redistribute to next layer up
+                      sol_st(ly,j) = sol_st(ly,j) + ul_excess
+                      if (sol_st(ly,j) > sol_ul(ly,j)) then
+                          ul_excess = sol_st(ly,j) - 
+     &                        sol_ul(ly,j)
+                          sol_st(ly,j) = sol_ul(ly,j)
+                                  
+                              if (j1 == 1 .and. ul_excess > 
+     &                            1.e-4) then !if now in upper layer
+                                  if (pot_fr(j) > 0.) then
+                                      pot_vol(j) = pot_vol(j) + 
+     &                                    ul_excess
+                                  else
+                                      surfq(j) = surfq(j) + 
+     &                                    ul_excess
+                                  end if
+                                  ul_excess = 0.
+                              end if                          
+                      else
+                          ul_excess = 0.
+                          exit
+                      end if
+                    end do
+              end if
+          end if
+       end if
+      
 
-        if (sol_st(j1,j) - sol_ul(j1,j) > 1.e-4) then
-          ul_excess = sol_st(j1,j) - sol_ul(j1,j)
-          sol_st(j1,j) = sol_ul(j1,j)
-          nn = sol_nly(j)
-          do ly = nn - 1, 1, -1
-            sol_st(ly,j) = sol_st(ly,j) + ul_excess
-            if (sol_st(ly,j) > sol_ul(ly,j)) then
-              ul_excess = sol_st(ly,j) - sol_ul(ly,j)
-              sol_st(ly,j) = sol_ul(ly,j)
-            else
-              ul_excess = 0.
-              exit
-            end if
-            if (ly == 1 .and. ul_excess > 0.) then
-              !! add ul_excess to depressional storage and then to surfq
-              pot_vol(j) = pot_vol(j) + ul_excess
-            end if
-          end do
-          !compute tile flow again after saturation redistribution
-!         if (ldrain(j) > 0.) then
-!           ul_excess = sol_st(ldrain(j),j) - sol_fc(ldrain(j),j) 
-!           if (ul_excess > 0.) then
-!             lyrtilex = ul_excess * (1. - Exp(-24. / tdrain(j)))
-!           end if
-!         end if
-        end if
-      end if
-      end if
+!!old code          
+!      if (j1 < sol_nly(j)) then
+!        if (sol_st(j1,j) - sol_ul(j1,j) > 1.e-4) then
+!          sepday = sepday + (sol_st(j1,j) - sol_ul(j1,j))
+!          sol_st(j1,j) = sol_ul(j1,j)
+!        end if
+!      else
+!
+!        if (sol_st(j1,j) - sol_ul(j1,j) > 1.e-4) then
+!          ul_excess = sol_st(j1,j) - sol_ul(j1,j)
+!          sol_st(j1,j) = sol_ul(j1,j)
+!          nn = sol_nly(j)
+!          do ly = nn - 1, 1, -1
+!            sol_st(ly,j) = sol_st(ly,j) + ul_excess
+!            if (sol_st(ly,j) > sol_ul(ly,j)) then
+!              ul_excess = sol_st(ly,j) - sol_ul(ly,j)
+!              sol_st(ly,j) = sol_ul(ly,j)
+!            else
+!              ul_excess = 0.
+!              exit
+!            end if
+!            if (ly == 1 .and. ul_excess > 0.) then
+!              !! add ul_excess to depressional storage and then to surfq
+!              pot_vol(j) = pot_vol(j) + ul_excess
+!            end if
+!          end do
+!          !compute tile flow again after saturation redistribution
+!!         if (ldrain(j) > 0.) then
+!!           ul_excess = sol_st(ldrain(j),j) - sol_fc(ldrain(j),j) 
+!!           if (ul_excess > 0.) then
+!!             lyrtilex = ul_excess * (1. - Exp(-24. / tdrain(j)))
+!!           end if
+!!         end if
+!        end if
+!      end if
+!!      end if
 
       return
       end

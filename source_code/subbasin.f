@@ -209,16 +209,16 @@
        !!   surfq_ru(j) = 0.
           
           !! compute effective rainfall (amount that percs into soil)
-          inflpcp = Max(0.,precipday - surfq(j))
-!        end if
+!          inflpcp = Max(0.,precipday - surfq(j))
+!!        end if
          
-        !! perform management operations
-        if (yr_skip(j) == 0) call operatn
+!        !! perform management operations
+!        if (yr_skip(j) == 0) call operatn
           
-        if (auto_wstr(j) > 1.e-6 .and. irrsc(j) > 2) call autoirr       
+!        if (auto_wstr(j) > 1.e-6 .and. irrsc(j) > 2) call autoirr       
         
-        !! perform soil water routing
-        call percmain
+!        !! perform soil water routing
+!        call percmain
 
         !! compute evapotranspiration
         call etpot

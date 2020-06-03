@@ -259,6 +259,20 @@
         pdvas(78) = hruyro(71,j)
 !!      phos due to crack flow (tvap)
         pdvas(79) = hruyro(72,j)
+        
+# GWP edits
+        pdvas(80) = hruyro(73,j) / Real(366 - leapyr)
+        pdvas(81) = hruyro(74,j) / Real(366 - leapyr)
+        pdvas(82) = hruyro(75,j) / Real(366 - leapyr)
+        pdvas(83) = hruyro(76,j) / Real(366 - leapyr)
+        pdvas(84) = hruyro(77,j) / Real(366 - leapyr)
+        pdvas(85) = hruyro(78,j) / Real(366 - leapyr)
+        pdvas(86) = hruyro(79,j) / Real(366 - leapyr)
+        pdvas(87) = hruyro(80,j) / Real(366 - leapyr)
+        pdvas(88) = hruyro(81,j) / Real(366 - leapyr)
+        pdvas(89) = hruyro(82,j) / Real(366 - leapyr)
+
+# end GWP edits        
 
         if (ipdvas(1) > 0) then
           do ii = 1, itots

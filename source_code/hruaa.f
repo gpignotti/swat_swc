@@ -267,6 +267,20 @@
         pdvas(78) = hruaao(71,j)
 !!      phos due to crack flow (tvap)
         pdvas(79) = hruaao(72,j)
+        
+# GWP edits
+        pdvas(80) = hruaao(73,j) / 365.4
+        pdvas(81) = hruaao(74,j) / 365.4
+        pdvas(82) = hruaao(75,j) / 365.4
+        pdvas(83) = hruaao(76,j) / 365.4
+        pdvas(84) = hruaao(77,j) / 365.4
+        pdvas(85) = hruaao(78,j) / 365.4
+        pdvas(86) = hruaao(79,j) / 365.4
+        pdvas(87) = hruaao(80,j) / 365.4
+        pdvas(88) = hruaao(81,j) / 365.4
+        pdvas(89) = hruaao(82,j) / 365.4
+
+# end GWP edits                
 
 
         if (ipdvas(1) > 0) then

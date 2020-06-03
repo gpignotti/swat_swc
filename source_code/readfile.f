@@ -671,10 +671,48 @@
       if (isto > 0) then
         open (129,file='output.swr')
         write (129,5001) 
-5001    format (t20,'Soil Storage (mm)',/,t25,'Layer #',/,t3,'Day',t9,
-     *  'HRU',t19,'GIS',t34,'1',t46,'2',t58,'3',t70,'4',t82,'5',t93,'6',
-     *  t106,'7',t118,'8',t130,'9',t141,'10')
-      end if
+5001    format (t20,'Soil Storage (mm)',/,t15,'Layer #',/,t3,'Day',t13,
+     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+     *  '7',t112,'8',t124,'9',t135,'10')
+!!SWC edits by GWP - create depth and hk files (probably want off in most scenarios)      
+        open (1293,file='output.dg')
+        write (1293,5005) 
+5005    format (t20,'Soil Depth (mm)',/,t15,'Layer #',/,t3,'Day',t13,
+     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+     *  '7',t112,'8',t124,'9',t135,'10')
+        open (1295,file='output.sep')
+        write (1295,5007) 
+5007    format (t20,'Soil Sep',/,t15,'Layer #',/,t3,'Day',t13,
+     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+     *  '7',t112,'8',t124,'9',t135,'10')
+        open (1296,file='output.lat')
+        write (1296,5008) 
+5008    format (t20,'Soil Lat',/,t15,'Layer #',/,t3,'Day',t13,
+     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+     *  '7',t112,'8',t124,'9',t135,'10')
+        open (1297,file='output.inflpcp')
+        write (1297,5009) 
+5009    format (t20,'InflPcp',/,t15,'Layer #',/,t3,'Day',t13,
+     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+     *  '7',t112,'8',t124,'9',t135,'10')
+!        open (1298,file='output.awc')
+!        write (1298,5010) 
+!5010    format (t20,'AWC',/,t15,'Layer #',/,t3,'Day',t13,
+!     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+!     *  '7',t112,'8',t124,'9',t135,'10')
+!        open (1299,file='output.clay')
+!        write (1299,5011) 
+!5011    format (t20,'Clay',/,t15,'Layer #',/,t3,'Day',t13,
+!     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+!     *  '7',t112,'8',t124,'9',t135,'10')
+!        open (1300,file='output.bd')
+!        write (1300,5012) 
+!5012    format (t20,'BD',/,t15,'Layer #',/,t3,'Day',t13,
+!     *  'HRU',t28,'1',t40,'2',t52,'3',t64,'4',t76,'5',t87,'6',t100,
+!     *  '7',t112,'8',t124,'9',t135,'10')
+!
+!!End GWP edits
+	end if
 
 
 !! Output daily streamflow velocity for each channel (subbasin)
@@ -762,6 +800,12 @@
 !     & 6x,'conc_n',4x,'con_nirr',6x,'nsetlr',5x,'theta_n',7x,'tmpav',
 !     & 6x,'nitrok',/,15x,'m3',12x,'kg',12x,'ha',9x,'kg/m3',5x,'kg/m3',
 !     & 9x,'--',9x,'--',12x,'deg c',6x,'--')
+
+!!     GWP
+      read (101,5101) titldum
+      read(101,*,iostat=eof) iwriteperc
+!!    GWP
+
       close (101)
       return
 

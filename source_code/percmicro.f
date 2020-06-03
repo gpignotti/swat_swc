@@ -8,7 +8,7 @@
 !!    name         |units         |definition
 !!    ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 !!    hru_slp(:)   |m/m           |average slope steepness
-!!    ihru         |none          |HRU number
+!!    ihru		 |none          |HRU number
 !!    iwatable     |none          |high water table code:
 !!                                |0 no high water table
 !!                                |1 high water table
@@ -67,6 +67,7 @@
       integer, intent (in) :: ly1
       integer :: j
       real :: adjf, yy, dg, ho, ratio, sol_k_sep
+      real :: m, minv, n
 
       j = 0
       j = ihru
@@ -97,8 +98,11 @@
         else
           ho = 2. * sw_excess / ((sol_ul(ly1,j) - sol_fc(ly1,j)) /  dg)
         end if
+        !the factor must be changed from 0.024 to 0.001 because we changing from daily to hourly calculation
+!        latlyr = adjf * ho * sol_k(ly1,j) * hru_slp(j) / slsoil(j)      
+!     &                                                            * .024
         latlyr = adjf * ho * sol_k(ly1,j) * hru_slp(j) / slsoil(j)      
-     &                                                            * .024
+     &                                                            * .001
 
       if (latlyr < 0.) latlyr = 0. 
       if (latlyr > sw_excess) latlyr = sw_excess
@@ -122,16 +126,232 @@
          endif
       endif 
 !!  septic changes 1/28/09
-      
-      sol_hk(ly1,j) = Max(2., sol_hk(ly1,j))
 
-      !! compute seepage to the next layer
-      sepday = 0.
-      sepday = sw_excess * (1. - Exp(-24. / sol_hk(ly1,j)))
+!!SWC edits by GWP
+      if (iperc == 0) then ! original calculation
+          sol_hk(ly1,j) = Max(2., sol_hk(ly1,j))
+
+      !!  compute seepage to the next layer
+          sepday = 0.
+          sepday = sw_excess * (1. - Exp(-1. / sol_hk(ly1,j)))
+          
+      else if (iperc == 1) then ! Campbell-Rawls
+          !if (ly1 == 1) then
+			!z = sol_z(ly1,j)
+          !else
+			!z = sol_z(ly1,j) - sol_z(ly1-1,j)
+		!endif
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta  /
+     &            sol_por(ly1,j)
+!              if (se > 1.) then
+!                  se = 1.
+!              end if
+              n = 3. + 2. * ca_rb_b(ly1,j)
+              sol_kun = sol_k(ly1,j) * se ** n
+              sepday = sol_kun * 1.
+         end if
+          !sepday = min(sw_excess, sepday)
+          !sepday = min(sepday, sol_st(ly1,j))
+
+!      else if (iperc == 1) then ! Campbell-Rawls
+!     
+!          if (ly1 == 1) z = sol_z(ly1,j)
+!          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+!          sepday = 0.
+!         !if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+!          !    sepday = sol_k(ly1,j) * 1.
+!          !else
+!          theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+!          se = theta  /
+!     &        sol_por(ly1,j)
+!          n = 3. + 2. * ca_rb_b(ly1,j)
+!         sol_kun = sol_k(ly1,j) * se ** n
+!          !sepday = sol_kun * 1.
+!             
+!          sol_hk(ly1,j) = (sol_ul(ly1,j) - sol_fc(ly1,j)) / 
+!     &        sol_kun
+!          !sepday = sw_excess * (1. - Exp(-1. / sol_hk(ly1,j)))
+!          sepday = sol_st(ly1,j) * (1. - Exp(-1. / sol_hk(ly1,j)))
+ !             
+  !       end if
+
+
+      
+      else if (iperc == 2) then ! VanGenuchten-Rawls
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = (theta - rb_thr(ly1,j)) /
+     &            (sol_por(ly1,j) - rb_thr(ly1,j))
+              m = vg_rb_m(ly1,j)
+              if (m > 0) then
+                  minv = 1/m
+              else
+                  m = 0
+              end if
+              factor_1 = 1. - se ** minv
+              factor_2 = factor_1 ** m
+              factor_3 = 1. - factor_2
+              factor_4 = factor_3 ** 2.
+              if (se > 0) then
+                  sol_kun = sol_k(ly1,j) * factor_4 * se ** 0.5
+              else
+                  sol_kun = 0.
+              endif
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+      
+      else if (iperc == 3) then ! Campbell-Cosby
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta  /
+     &            sol_por(ly1,j)
+              n = 3. + 2. * ca_co_b(ly1,j)
+              sol_kun = sol_k(ly1,j) * se ** n
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))         
+  
+      
+      else if (iperc == 4) then ! VanGenuchten-Cosby
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta  /
+     &            sol_por(ly1,j)
+              m = vg_co_m(ly1,j)
+              if (m > 0) then
+                  minv = 1/m
+              else
+                  m = 0
+              end if
+              factor_1 = 1. - se ** minv
+              factor_2 = factor_1 ** m
+              factor_3 = 1. - factor_2
+              factor_4 = factor_3 ** 2.
+              sol_kun = sol_k(ly1,j) * factor_4 * se ** 0.5
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+          
+      
+      else if (iperc == 5) then ! Campbell-Saxton
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta  /
+     &            sol_por(ly1,j)
+              n = 3. + 2. * ca_sx_b(ly1,j)
+              sol_kun = sol_k(ly1,j) * se ** n
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+          
+      
+      else if (iperc == 6) then ! VanGenuchten-Saxton
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta /
+     &            sol_por(ly1,j)
+              m = vg_sx_m(ly1,j)
+              if (m > 0) then
+                  minv = 1/m
+              else
+                  m = 0.
+              end if
+              factor_1 = 1. - se ** minv
+              factor_2 = factor_1 ** m
+              factor_3 = 1. - factor_2
+              factor_4 = factor_3 ** 2.
+              sol_kun = sol_k(ly1,j) * factor_4 * se ** 0.5
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+          
+      
+      else if (iperc == 7) then ! Campbell-Wosten
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = theta  /
+     &            sol_por(ly1,j)
+              n = 3. + 2. * ca_wo_b(ly1,j)
+              sol_kun = sol_k(ly1,j) * se ** n
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+          
+      
+      else if (iperc == 8) then ! VanGenuchten-Wosten
+          if (ly1 == 1) z = sol_z(ly1,j)
+          if (ly1 > 1) z = sol_z(ly1,j) - sol_z(ly1-1,j)
+          sepday = 0.
+          if (sol_st(ly1,j) > 0.99 * sol_ul(ly1,j)) then
+              sepday = sol_k(ly1,j) * 1.
+          else
+              theta = sol_st(ly1,j) / z + sol_wp(ly1,j)
+              se = (theta - wo_thr(ly1,j)) /
+     &            (sol_por(ly1,j) - wo_thr(ly1,j))
+              m = vg_wo_m(ly1,j)
+              if (m > 0) then
+                  minv = 1/m
+              else
+                  m = 0.
+              end if
+              factor_1 = 1. - se ** minv
+              factor_2 = factor_1 ** m
+              factor_3 = 1. - factor_2
+              factor_4 = factor_3 ** 2.
+              if (se > 0) then
+                  sol_kun = sol_k(ly1,j) * factor_4 * se ** 0.5
+              else
+                  sol_kun = 0.
+              endif
+              sepday = sol_kun * 1.
+         end if
+           !sepday = min(sepday, sol_st(ly1,j))
+               
+      end if
+!!End GWP edits
       
       !! limit maximum seepage from biozone layer below potential perc amount
 	if(ly1 == i_sep(j).and.isep_opt(j)==1) then
-	   sepday = min(sepday,sol_k_sep *24.)
+	   !sepday = min(sepday,sol_k_sep *24.)
+          sepday = min(sepday,sol_k_sep *1.)
 	   bz_perc(j) = sepday
 	end if
       
@@ -145,19 +365,22 @@
         end if
       end if
 
-      !! check mass balance
-      if (sepday + latlyr > sw_excess) then
-        ratio = 0.
-        ratio = sepday / (latlyr + sepday)
-        sepday = 0.
-        latlyr = 0.
-        sepday = sw_excess * ratio
-        latlyr = sw_excess * (1. - ratio)
-      endif
-      if (sepday + lyrtile > sw_excess) then
-        sepday = 0.
-        sepday = sw_excess - lyrtile
-      endif
 
+      ! this is now done in percmain    
+            !! check mass balance moved to percmain
+!      if (sepday + latlyr > sw_excess) then
+!        ratio = 0.
+!        ratio = sepday / (latlyr + sepday)
+!        sepday = 0.
+!        latlyr = 0.
+!        sepday = sw_excess * ratio
+!        latlyr = sw_excess * (1. - ratio)
+!      endif
+!      if (sepday + lyrtile > sw_excess) then
+!        sepday = 0.
+!        sepday = sw_excess - lyrtile
+!      endif
+
+      
       return
       end

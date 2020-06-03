@@ -379,6 +379,33 @@
 	sol_cal = 0  
 	bio_init = 0
 	lai_init = 0
+      
+      !! SWC edits by GWP
+      iimp = 0
+      iperc = 0
+      iwriteperc = 0
+      sol_sep = 0
+      sol_exw = 0
+      sol_ule = 0
+      sol_dg = 0.
+      sol_sep = 0.
+      sol_lat = 0.
+      infl_print = 0.
+      !PTF parameters
+      wo_thr = 0.
+      rb_thr = 0.
+      ca_rb_b = 0.
+      vg_rb_m = 0.
+      ca_co_b = 0.
+      vg_co_m = 0.
+      ca_sx_b = 0.
+      vg_sx_m = 0.
+      ca_wo_b = 0.
+      vg_wo_m = 0.
+      
+      vswc = 0.
+      swcexp = 0.
+      !!End GWP edits
 	  
 	  
       return

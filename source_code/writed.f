@@ -107,10 +107,24 @@
 !!    writes out the amount of water stored in the soil layer
       if (isto > 0) then 
         do j = 1, nhru
-          write (129,5000) iida, j, subnum(j), hruno(j), (sol_st(j1,j), 
-     &         j1 = 1, sol_nly(j))
-!          write (129,5000) iida, subnum(j), hruno(j),                   
-!     &             (sol_no3(j1,j), j1 = 1, sol_nly(j))
+!! SWC edits by GWP - add WP back into printed out SW storage
+          write (129,5000) iida, j, (sol_st(j1,j) + sol_wpmm(j1,j), 
+     &                 j1 = 1, sol_nly(j))
+          write (1293,5000) iida, j, (sol_dg(j1,j), 
+     &                 j1 = 1, sol_nly(j))
+          write (1295,5000) iida, j, (sol_sep(j1,j), 
+     &                 j1 = 1, sol_nly(j))
+          write (1296,5000) iida, j, (sol_lat(j1,j), 
+     &                 j1 = 1, sol_nly(j))
+          write (1297,5000) iida, j, (infl_print(j1,j), 
+     &                 j1 = 1, sol_nly(j))
+!          write (1298,5000) iida, j, (sol_awc(j1,j), 
+!     &                 j1 = 1, sol_nly(j))
+!           write (1299,5000) iida, j, (sol_clay(j1,j), 
+!     &                 j1 = 1, sol_nly(j))
+!          write (1300,5000) iida, j, (sol_bd(j1,j), 
+!     &                 j1 = 1, sol_nly(j))
+   !!End GWP edits
         enddo
       end if
 
@@ -174,12 +188,11 @@
       wpstmono = wpstmono + wpstdayo
       hrupstm = hrupstm + hrupstd
 
-
       return
 !5000  format(i5,1x,a5,a4,1x,500e12.4)
 
-!5000  format (i5,1x,i5,1x,500e12.4)
-5000  format (i5,1x,i5,1x,a5,a4,1x,500e12.4)
+5000  format (i5,1x,i5,1x,500e12.4)
+!5000  format (i5,1x,i5,1x,a5,a4,1x,500e12.4)
 5001  format(2i5,500f12.4)
 5100  format(1x,a5,a4,1x,i4,1x,i3,1x,250(e16.4,1x))
 5200  format(i7,i9,i6,i5,1x,e9.4,f12.3,f7.1,f14.3)

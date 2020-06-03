@@ -442,12 +442,27 @@
 
       integer :: j, k
       real :: cnv
+      integer :: hval
 
       j = 0
       j = ihru
   
       cnv = 0.
       cnv = 10. * hru_ha(j)
+      
+      !Edits by GWP get mm/mm SWC by layer to print in output.hru
+      z = 0.
+      ly = 0.
+      
+      do ly = 1, sol_nly(j)
+          if (ly == 1) then
+              z = sol_z(ly,j)
+          else
+              z = sol_z(ly,j) - sol_z(ly-1,j)
+          end if
+          vswc(ly,j) = sol_st(ly,j) / z + sol_wp(ly,j)
+      end do
+    !End of GWP edits
 
       if (curyr > nyskip) then
       !! HRU summations
@@ -522,6 +537,28 @@
         hrumono(70,j) = hrumono(70,j) + gw_qdeep(j)
         hrumono(71,j) = hrumono(71,j) + latq(j) - lpndloss - lwetloss
         hrumono(72,j) = hrumono(72,j) + vap_tile
+        
+# GWP edits
+
+        !hval = 73
+        
+        !do ly = 1, sol_nly(j)
+        !    hrumono(hval,j) = hrumono(hval,j) + vswc(ly,j)
+        !    hval = hval + 1
+        !end do
+        
+        hrumono(73,j) = hrumono(73,j) + vswc(1,j)
+        hrumono(74,j) = hrumono(74,j) + vswc(2,j)
+        hrumono(75,j) = hrumono(75,j) + vswc(3,j)
+        hrumono(76,j) = hrumono(76,j) + vswc(4,j)
+        hrumono(77,j) = hrumono(77,j) + vswc(5,j)
+        hrumono(78,j) = hrumono(78,j) + vswc(6,j)
+        hrumono(79,j) = hrumono(79,j) + vswc(7,j)
+        hrumono(80,j) = hrumono(80,j) + vswc(8,j)
+        hrumono(81,j) = hrumono(81,j) + vswc(9,j)
+        hrumono(82,j) = hrumono(82,j) + vswc(10,j) !Can change based on how many layers need printed
+
+# end edits
 
         wtrmon(1,j) = wtrmon(1,j) + pndev / cnv
         wtrmon(2,j) = wtrmon(2,j) + pndsep / cnv

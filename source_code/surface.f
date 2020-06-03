@@ -116,6 +116,22 @@
 
       surfq(j) = surfq(j) + qird(j)
       qird(j) = 0.
+      
+      !!GWP - Moved code from subbasin to here to allow for returned sat flow to runoff
+      inflpcp = Max(0., precipday - surfq(j))
+      
+      !! perform management operations
+      if (yr_skip(j) == 0) call operatn
+      
+      if (auto_wstr(j) > 1.e-6 .and. irrsc(j) > 2) call autoirr
+      
+      call percmain
+      
+      !again for inflpcp just in case it was adjusted by surfq in percmain
+      !*not sure how this changes anything yet
+      inflpcp = Max(0., precipday - surfq(j))
+      
+      !!End of code move GWP
 
       !! calculate amount of surface runoff reaching main channel during day
       !! (qday) and store the remainder

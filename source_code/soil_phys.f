@@ -167,6 +167,7 @@
         dg = 0.
         pormm = 0.
         dg = sol_z(j,i) - xx
+        sol_dg(j,i) = dg
         pormm = sol_por(j,i) * dg
         sumpor = sumpor + pormm
         sol_ul(j,i) = (sol_por(j,i) - sol_wp(j,i)) * dg
@@ -238,6 +239,84 @@
 
       call curno(cn2(i),i) !! J.Jeong 4/18/2008
 !      call curno_subd(cn2(i),i)  !! changed for URBAN
+
+!!    SWC edits by GWP
+      if (iperc > 0) then
+          do ilyr = 1, sol_nly(i)
+              if (sol_sand(ilyr,i) > 65) then
+                  wo_thr(ilyr,i) = 0.025
+              else
+                  wo_thr(ilyr,i) = 0.01
+              end if
+              rb_thr(ilyr,i) = -0.0182482 +
+     &            0.00087269 * sol_sand(ilyr,i)  +      
+     &            0.00513488 * sol_clay(ilyr,i) + 
+     &            0.02939286 * sol_por(ilyr,i) -
+     &            0.00015395 * sol_clay(ilyr,i) ** 2. - 
+     &            0.0010827 * sol_sand(ilyr,i) * sol_por(ilyr,i) - 
+     &            0.00018233 * sol_clay(ilyr,i) ** 2. * 
+     &            sol_por(ilyr,i) ** 2. +
+     &            0.00030703 * sol_clay(ilyr,i) ** 2. * sol_por(ilyr,i) 
+     &            - 0.0023584 * sol_por(ilyr,i) ** 2. * sol_clay(ilyr,i)
+              ca_rb_lam = Exp(-0.7842831 + 
+     &            0.0177544 * sol_sand(ilyr,i) -
+     &            1.062498 * sol_por(ilyr,i) -
+     &            0.00005304 * sol_sand(ilyr,i) ** 2. -
+     &            0.00273493 * sol_clay(ilyr,i) ** 2. +
+     &            1.11134946 * sol_por(ilyr,i) ** 2. -
+     &            0.03088295 * sol_sand(ilyr,i) * sol_por(ilyr,i) +
+     &            0.00026587 * sol_sand(ilyr,i) ** 2. * 
+     &            sol_por(ilyr,i) ** 2. -
+     &            0.00610522 * sol_clay(ilyr,i) ** 2. * 
+     &            sol_por(ilyr,i) ** 2. -
+     &            0.00000235 * sol_sand(ilyr,i) ** 2. * 
+     &            sol_clay(ilyr,i) +
+     &            0.00798746 * sol_clay(ilyr,i) ** 2. * sol_por(ilyr,i) 
+     &            - 0.00674491 * sol_por(ilyr,i) ** 2. * 
+     &            sol_clay(ilyr,i))
+              ca_rb_b(ilyr,i) = 1 / ca_rb_lam
+              vg_rb_m(ilyr,i) = ca_rb_lam / (ca_rb_lam + 1.)
+              ca_co_b(ilyr,i) = 2.91 + 0.159 * sol_clay(ilyr,i)
+              vg_co_m(ilyr,i) = 1 / (1 + ca_co_b(ilyr,i))
+              
+!Use swcexp multiplicative factor in calibration
+              ca_rb_b(ilyr,i) = ca_rb_b(ilyr,i) * (1. + swcexp)
+              vg_rb_m(ilyr,i) = vg_rb_m(ilyr,i) * (1. + swcexp)
+              ca_co_b(ilyr,i) = ca_co_b(ilyr,i) * (1. + swcexp)
+              vg_co_m(ilyr,i) = vg_co_m(ilyr,i) * (1. + swcexp)
+
+!End change w/ swcexp              
+              
+              ca_sx_b(ilyr,i) = 3.14 + 0.00222 * sol_clay(ilyr,i) ** 2. 
+     &            + 0.00003484 * sol_sand(ilyr,i) ** 2. * 
+     &            sol_clay(ilyr,i) 
+              vg_sx_m(ilyr,i) = 1. / (1. + ca_sx_b(ilyr,i))
+              if (ilyr > 2) then
+                  wo_factor = 0.
+              else
+                  wo_factor = 1.
+              end if
+              ca_wo_n = 1. + Exp(-25.23 - 0.02195 * sol_clay(ilyr,i) + 
+     &            0.0074 * sol_silt(ilyr,i) - 
+     &            0.194 * sol_cbn(ilyr,i) + 
+     &            45.5 * sol_bd(ilyr,i) - 
+     &            7.24 * sol_bd(ilyr,i) ** 2. + 
+     &            0.0003658 * sol_clay(ilyr,i) ** 2. + 
+     &            0.002885 * sol_cbn(ilyr,i) ** 2. - 
+     &            12.81 * sol_bd(ilyr,i) ** -1. - 
+     &            0.1524 * sol_silt(ilyr,i) ** -1. - 
+     &            0.01958 * sol_cbn(ilyr,i) ** -1. - 
+     &            0.2876 * Log(sol_silt(ilyr,i)) - 
+     &            0.0709 * Log(sol_cbn(ilyr,i)) - 
+     &            44.6 * Log(sol_bd(ilyr,i)) - 
+     &            0.02264 * sol_bd(ilyr,i) * sol_clay(ilyr,i) + 
+     &            0.0896 * sol_bd(ilyr,i) * sol_cbn(ilyr,i) + 
+     &            0.00718 * wo_factor * sol_clay(ilyr,i))
+              ca_wo_b(ilyr,i) = 1. / (ca_wo_n - 1)
+              vg_wo_m(ilyr,i) = 1. - 1. / co_wo_n
+          end do
+      end if
+!!    End GWP edits
 
       return
       end
