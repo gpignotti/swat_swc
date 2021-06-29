@@ -14,6 +14,7 @@ Water Balance:
            1.000    | EPCO: plant water uptake compensation factor
            3.000    | EVLAI : Leaf area index at which no evaporation occurs from water surface [m2/m2]
            0.000    | FFCB : Initial soil water storage expressed as a fraction of field capacity water content
+           0.000    | SWCEXP : Multiplicative factor used for calibration of b/m parameter in CA and VG equations		   
 Surface Runoff:
                0    | IEVENT: rainfall/runoff code: 0=daily rainfall/CN
                0    | ICRK: crack flow code: 1=model crack flow in soil
@@ -129,4 +130,4 @@ Subdaily Erosion:
                0    | SSTMAXD_BSN: basinwide retention parm adjustment factor
                0    | ISMAX: max depressional storage code
                0    | IROUTUNIT:
-			   1	| IPERC: Changes the percolation method (0=default, 1=CA-RA, 2=VG-RA, 3=CA-CO, 4=VG-CO, 5=CA-SX, 6=VG-SX, 7=CA-WO, 8=VG-WO)
+			   3	| IPERC: Changes the percolation method (0=default, 1=CA-RA, 2=VG-RA, 3=CA-CO, 4=VG-CO, 5=CA-SX, 6=VG-SX, 7=CA-WO, 8=VG-WO)
