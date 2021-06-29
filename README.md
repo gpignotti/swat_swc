@@ -26,6 +26,7 @@ There are two new flags that can be used to specify which soil water equation to
 (1) In the basins.bsn file an two extra lines are needed, one on line 17 and one at the bottom line of the file to specify percentage change to the exponential value of the Campbell and van Genuchten equations and the soil water percolation equation used by SWAT as follows:
 
 Line 17:
+
 0.000    | SWCEXP : Multiplicative factor used for calibration of b/m parameter in CA and VG equations
 
 SWCEXP: A flag value of zero will not change the exponent value and will simply use the default value calculated by the PTFs as specified from the IPERC flag. Non-zero values will apply a percentage change to the exponent, either positive or negative as specified by the user.
