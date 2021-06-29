@@ -35,7 +35,7 @@ Last line:
 
 1	| IPERC: Changes the percolation method (0=default, 1=CA-RA, 2=VG-RA, 3=CA-CO, 4=VG-CO) 
 
-IPERC: A flag value of 0 will use the default SWAT soil percolation equation. This is not recommended, rather the user should simply run an officially released SWAT executable if the default is preferred. Flag values of 1, 2, 3, and 4 indicate the Campbell-Rawls, van Genuchten-Rawls, Campbell-Cosby, and van Genuchten-Cosby equations respectively. Although, other options have been coded (5-8), users are cautioned against their use as they have not undergone testing to date.
+IPERC: A flag value of 0 will use the default SWAT soil percolation equation. This is not recommended, rather the user should simply run an officially released SWAT executable if the default is preferred. Flag values of 1, 2, 3, and 4 indicate the Campbell-Rawls, van Genuchten-Rawls, Campbell-Cosby, and van Genuchten-Cosby equations respectively. Although, other options have been coded (5-8), users are cautioned against their use as they have not undergone testing to date. Codes 3 and 4 are used in the paper.
 
 (2) The second flag is in file.cio and turns on and off printing of additional soil water variables and is similarly added as a line at the bottom of the file as follows:
 
