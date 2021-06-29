@@ -1,5 +1,5 @@
 # SWAT_SWC code and executables
-#### See Pignotti et al. (2021) <link> for details about the theory and development behind this code.
+#### See [Pignotti et al. (2021)](https://onlinelibrary.wiley.com/share/author/EARIJMERNHWYY57XECAJ?target=10.1002/hyp.14034) <link> for details about the theory and development behind this code.
 
 ## This repository contains three directories
 1. compiled (modified) SWAT executables (both Windows and Linux)
