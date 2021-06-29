@@ -24,15 +24,21 @@ Please see the document: CodeEditsSummary.pdf for a full description of all SWAT
 There are two new flags that can be used to specify which soil water equation to use and to turn on printing of extra variables.
 
 (1) In the basins.bsn file an two extra lines are needed, one on line 17 and one at the bottom line of the file to specify percentage change to the exponential value of the Campbell and van Genuchten equations and the soil water percolation equation used by SWAT as follows:
+
 Line 17:
 0.000    | SWCEXP : Multiplicative factor used for calibration of b/m parameter in CA and VG equations
+
 SWCEXP: A flag value of zero will not change the exponent value and will simply use the default value calculated by the PTFs as specified from the IPERC flag. Non-zero values will apply a percentage change to the exponent, either positive or negative as specified by the user.
 
 Last line:
+
 1	| IPERC: Changes the percolation method (0=default, 1=CA-RA, 2=VG-RA, 3=CA-CO, 4=VG-CO) 
+
 IPERC: A flag value of 0 will use the default SWAT soil percolation equation. This is not recommended, rather the user should simply run an officially released SWAT executable if the default is preferred. Flag values of 1, 2, 3, and 4 indicate the Campbell-Rawls, van Genuchten-Rawls, Campbell-Cosby, and van Genuchten-Cosby equations respectively. Although, other options have been coded (5-8), users are cautioned against their use as they have not undergone testing to date.
 
 (2) The second flag is in file.cio and turns on and off printing of additional soil water variables and is similarly added as a line at the bottom of the file as follows:
+
 1	| IWRITEPERC: Code for printing new output soil files
+
 Where 0 will not print the variables and 1 will print files for layer-based lateral flow, percolation, depth, and infiltration precipitation.
 
