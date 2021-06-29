@@ -17,7 +17,7 @@ Also note: Changes made to the code provide the user the ability to print volume
 ### 2. Modified source code
 The main focus of modifying the SWAT code was to incorporate alternative equations to calculate soil water percolation based off the Campbell and van Genuchten approximations of hydraulic conductivity as described in the body of the paper. Additionally, this necessitated: 1) calculating the parameters for the equations based on soil properties, 2) creating an hourly loop for percolation, 3) better constraining maximum and minimum percolation and soil water content, and 4) printing new output files.
 
-Please see the document: [Code_Edits_Summary.pdf] for a full description of all SWAT source code files edited.
+Please see the document: [Code_Edits_Summary.pdf](https://github.com/gpignotti/swat_swc/blob/master/Code_edits_summary.pdf) for a full description of all SWAT source code files edited.
 
 
 ### 3. Example input files
