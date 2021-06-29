@@ -8,7 +8,7 @@
 
 
 ### 1. Executables
-Two compiled executables are made available for Windows and Linux systems in /gpignotti/swat_swc/tree/master/executables
+Two compiled executables are made available for Windows (SWAT_nFC.exe) and Linux (swat664_nfc) systems in /gpignotti/swat_swc/tree/master/executables
 
 Please note: For  comparison of output soil water values, the values in the output.swr file have been modified to print total soil water content, rather than available water content as specified by the default SWAT output. That is, the output.swr file now records available soil water plus wilting point water, not soil water content without wilting point water content.
 
