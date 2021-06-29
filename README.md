@@ -8,13 +8,29 @@
 
 
 ### 1. Executables
-Two compiled executables are made available for Windows and Linux systems in /swat_swc/executables
+Two compiled executables are made available for Windows and Linux systems in /gpignotti/swat_swc/tree/master/executables
 
 Please note: For  comparison of output soil water values, the values in the output.swr file have been modified to print total soil water content, rather than available water content as specified by the default SWAT output. That is, the output.swr file now records available soil water plus wilting point water, not soil water content without wilting point water content.
 
 Also note: Changes made to the code provide the user the ability to print volumetric soil water content for specified HRUs and associated layers in file.cio. HRU output variables 80-89 will print volumetric soil water content for soil layers 1-10 respectively for user-specified HRUs. Volumetric soil output is useful when comparing to observed soil moisture information which is generally recoded volumetrically as opposed to the equivalent water depth used in SWAT.
 
 ### 2. Modified source code
+The main focus of modifying the SWAT code was to incorporate alternative equations to calculate soil water percolation based off the Campbell and van Genuchten approximations of hydraulic conductivity as described in the body of the paper. Additionally, this necessitated: 1) calculating the parameters for the equations based on soil properties, 2) creating an hourly loop for percolation, 3) better constraining maximum and minimum percolation and soil water content, and 4) printing new output files.
+In general the approach is summarized as:
+Time loop [1,24]
+	Layer loop [1,number layers]
+		Soil storage = Soil storage + Percolation from layer above
+		If Soil storage > Wilting Point
+			Calculate Lateral flow and Percolation (user selected equation)
+			Soil storage = Soil storage – Percolation – Lateral flow
+			Redistribute any soil water above saturation
+			Check Soil storage is within maximum and minimum values
+		End If
+	Next Layer
+Next Time step
+
+Please see the document: CodeEditsSummary.pdf for a full description of all SWAT source code files edited.
+
 
 ### 3. Example input files
 There are two new flags that can be used to specify which soil water equation to use and to turn on printing of extra variables.
